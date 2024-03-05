@@ -1,8 +1,8 @@
+import openpyxl
 import tkinter as tk
 from tkinter import filedialog, ttk
 import time
 import csv
-import openpyxl
 from openpyxl.styles import Alignment, Font, Border, Side, PatternFill
 import datetime
 import os
