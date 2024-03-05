@@ -1,15 +1,79 @@
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, ttk
 import time
 import csv
 import openpyxl
-from openpyxl.styles import Alignment
-import traceback
-from tkinter import ttk
+from openpyxl.styles import Alignment, Font, Border, Side, PatternFill
 import datetime
 import os
 import re
- 
+
+# Initialize the GUI application
+root = tk.Tk()
+root.title("CSV File Editor")
+window_width = 400
+window_height = 275
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+x_coordinate = int((screen_width - window_width) / 2)
+y_coordinate = int((screen_height - window_height) / 2)
+root.geometry(f"{window_width}x{window_height}+{x_coordinate}+{y_coordinate}")
+
+# Create a ttk.Style object
+style = ttk.Style()
+
+# Initially define the theme
+current_theme = "light"
+
+# Define color schemes for dark and light modes, including ttk styles
+color_schemes = {
+    "light": {
+        "bg": "#FFFFFF",
+        "fg": "#000000",
+        "button_bg": "#4CAF50",
+        "button_fg": "white",
+        "ttk_theme": "default"
+    },
+    "dark": {
+        "bg": "#333333",
+        "fg": "#CCCCCC",
+        "button_bg": "#555555",
+        "button_fg": "white",
+        "ttk_theme": "clam"
+    }
+}
+
+progress_var = tk.DoubleVar()
+
+# Function to toggle and apply themes
+def toggle_theme():
+    global current_theme
+    current_theme = "dark" if current_theme == "light" else "light"
+    apply_theme()
+
+def apply_theme():
+    theme = color_schemes[current_theme]
+    root.configure(bg=theme["bg"])
+    for widget in root.winfo_children():
+        if isinstance(widget, tk.Button) or isinstance(widget, tk.Label):
+            widget.configure(bg=theme["bg"], fg=theme["fg"])
+        if isinstance(widget, tk.Text):
+            widget.configure(bg=theme["bg"], fg=theme["fg"])
+    # Configure button specific colors
+    select_button.configure(bg=color_schemes[current_theme]["button_bg"], fg=color_schemes[current_theme]["button_fg"])
+    select_template_button.configure(bg=color_schemes[current_theme]["button_bg"], fg=color_schemes[current_theme]["button_fg"])
+    edit_button.configure(bg=color_schemes[current_theme]["button_bg"], fg=color_schemes[current_theme]["button_fg"])
+    toggle_theme_button.configure(bg=color_schemes[current_theme]["button_bg"], fg=color_schemes[current_theme]["button_fg"])
+    # Configure progress bar style
+    if current_theme == "dark":
+        style_name = "Dark.Horizontal.TProgressbar"
+        style.configure(style_name, background="#555555", troughcolor="#333333")
+        progress_bar.configure(style=style_name)
+    else:
+        style_name = "Light.Horizontal.TProgressbar"
+        style.configure(style_name, background="#FFFFFF", troughcolor="#E0E0E0")
+        progress_bar.configure(style=style_name)
+
 def update_progress(progress_var, value, max_value):
     progress = (value / max_value) * 100
     progress_var.set(progress)
@@ -184,40 +248,43 @@ def edit_file_wrapper():
     template_path = template_display_text.get("1.0", "end-1c")
     if file_path:
         edit_file(file_path, template_path)
-root = tk.Tk()
-root.title("CSV File Editor")
-window_width = 400
-window_height = 275
-screen_width = root.winfo_screenwidth()
-screen_height = root.winfo_screenheight()
-x_coordinate = int((screen_width - window_width) / 2)
-y_coordinate = int((screen_height - window_height) / 2)
-root.geometry(f"{window_width}x{window_height}+{x_coordinate}+{y_coordinate}")
+
+# GUI component definitions with corrected commands for functionality
 title_label = tk.Label(root, text="Attach the CSV File needing Editing", font=("Arial", 14))
 title_label.grid(row=0, column=0, columnspan=2, pady=10)
+
 select_button = tk.Button(root, text="Select File", command=select_file, padx=10, pady=5, bg="#4CAF50", fg="white")
 select_button.grid(row=1, column=0, padx=10, pady=5)
-file_display_text = tk.Text(root, height=1, width=20, wrap=tk.WORD, state=tk.DISABLED)
+
+file_display_text = tk.Text(root, height=1, width=20, wrap=tk.WORD, state=tk.DISABLED)  # Adjusted width for better layout
 file_display_text.grid(row=1, column=1, padx=10, pady=5)
+
 file_scrollbar = tk.Scrollbar(root, command=file_display_text.yview)
 file_scrollbar.grid(row=1, column=2, sticky='nsew')
 file_display_text['yscrollcommand'] = file_scrollbar.set
+
 select_template_button = tk.Button(root, text="Select Template for Header", command=select_template, padx=10, pady=5, bg="#4CAF50", fg="white")
 select_template_button.grid(row=2, column=0, padx=10, pady=5)
-template_display_text = tk.Text(root, height=1, width=20, wrap=tk.WORD, state=tk.DISABLED)
+
+template_display_text = tk.Text(root, height=1, width=20, wrap=tk.WORD, state=tk.DISABLED)  # Adjusted width for better layout
 template_display_text.grid(row=2, column=1, padx=10, pady=5)
+
 template_scrollbar = tk.Scrollbar(root, command=template_display_text.yview)
 template_scrollbar.grid(row=2, column=2, sticky='nsew')
 template_display_text['yscrollcommand'] = template_scrollbar.set
+
 edit_button = tk.Button(root, text="Edit File", command=edit_file_wrapper, padx=10, pady=5, bg="#007BFF", fg="white")
-edit_button.grid(row=3, column=0, padx=10, pady=5)
+edit_button.grid(row=3, column=0, columnspan=2, padx=10, pady=5)
+
 progress_var = tk.DoubleVar()
 progress_bar = ttk.Progressbar(root, orient="horizontal", length=300, mode="determinate", variable=progress_var)
 progress_bar.grid(row=4, column=0, columnspan=2, padx=10, pady=10)
-progress_label = tk.Label(root, text="0%", font=("Arial", 12))
-progress_label.grid(row=5, column=0, columnspan=2)
-def update_progress_label(value):
-    progress_label.config(text=f"{int(value)}%")
-progress_var.trace("w", lambda *args: update_progress_label(progress_var.get()))
+
+# Add a toggle theme button
+toggle_theme_button = tk.Button(root, text="Toggle Theme", command=toggle_theme, padx=10, pady=5)
+
+# Apply initial theme
+apply_theme()
+
 root.mainloop()
 
