@@ -4,6 +4,7 @@ from tkinter import filedialog, ttk
 import time
 import csv
 from openpyxl.styles import Alignment, Font, Border, Side, PatternFill
+from PyQt5.QtWidgets import QApplication, QWidget
 import datetime
 import os
 import re
@@ -12,7 +13,7 @@ import re
 root = tk.Tk()
 root.title("CSV File Editor")
 window_width = 400
-window_height = 275
+window_height = 290
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 x_coordinate = int((screen_width - window_width) / 2)
@@ -78,6 +79,7 @@ def update_progress(progress_var, value, max_value):
     progress = (value / max_value) * 100
     progress_var.set(progress)
     root.update_idletasks()
+
 def sort_sheet(worksheet):
     def custom_sort(row):
         sort_columns = [8, 6, 15, 16, 20, 21]
@@ -256,7 +258,7 @@ title_label.grid(row=0, column=0, columnspan=2, pady=10)
 select_button = tk.Button(root, text="Select File", command=select_file, padx=10, pady=5, bg="#4CAF50", fg="white")
 select_button.grid(row=1, column=0, padx=10, pady=5)
 
-file_display_text = tk.Text(root, height=1, width=20, wrap=tk.WORD, state=tk.DISABLED)  # Adjusted width for better layout
+file_display_text = tk.Text(root, height=1, width=20, wrap=tk.WORD, state=tk.DISABLED)
 file_display_text.grid(row=1, column=1, padx=10, pady=5)
 
 file_scrollbar = tk.Scrollbar(root, command=file_display_text.yview)
@@ -266,7 +268,7 @@ file_display_text['yscrollcommand'] = file_scrollbar.set
 select_template_button = tk.Button(root, text="Select Template for Header", command=select_template, padx=10, pady=5, bg="#4CAF50", fg="white")
 select_template_button.grid(row=2, column=0, padx=10, pady=5)
 
-template_display_text = tk.Text(root, height=1, width=20, wrap=tk.WORD, state=tk.DISABLED)  # Adjusted width for better layout
+template_display_text = tk.Text(root, height=1, width=20, wrap=tk.WORD, state=tk.DISABLED)
 template_display_text.grid(row=2, column=1, padx=10, pady=5)
 
 template_scrollbar = tk.Scrollbar(root, command=template_display_text.yview)
@@ -281,7 +283,8 @@ progress_bar = ttk.Progressbar(root, orient="horizontal", length=300, mode="dete
 progress_bar.grid(row=4, column=0, columnspan=2, padx=10, pady=10)
 
 # Add a toggle theme button
-toggle_theme_button = tk.Button(root, text="Toggle Theme", command=toggle_theme, padx=10, pady=5)
+toggle_theme_button = tk.Button(root, text="Dark/Light", command=toggle_theme, padx=10, pady=5)
+toggle_theme_button.grid(row=5, column=0, columnspan=2, padx=10, pady=5)
 
 # Apply initial theme
 apply_theme()
