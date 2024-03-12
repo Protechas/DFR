@@ -1,3 +1,8 @@
+import os
+
+ # Here's the change: Specify the path to the mobile Python interpreter
+mobile_python_path = os.path.join("Documents", "ELYSIUM Python", "python") # Assuming 'python' is the mobile Python interpreter executable
+
 import openpyxl
 import tkinter as tk
 from tkinter import filedialog, ttk
@@ -6,7 +11,6 @@ import csv
 from openpyxl.styles import Alignment, Font, Border, Side, PatternFill
 from PyQt5.QtWidgets import QApplication, QWidget
 import datetime
-import os
 import re
 
 # Initialize the GUI application
