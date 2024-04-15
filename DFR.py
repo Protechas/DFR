@@ -7,6 +7,7 @@ from openpyxl.styles import Alignment, Font, Border, Side, PatternFill
 from PyQt5.QtWidgets import QApplication, QWidget
 import datetime
 import re
+import os
 
 # Initialize the GUI application
 root = tk.Tk()
@@ -82,8 +83,10 @@ def update_progress(progress_var, value, max_value):
 def sort_sheet(worksheet):
     def custom_sort(row):
         sort_columns = [8, 6, 15, 16, 20, 21]
-        sort_values = [row[col - 1] for col in sort_columns]
+        # Here we use a fallback value for None (empty string in this case)
+        sort_values = [(row[col - 1] if row[col - 1] is not None else '') for col in sort_columns]
         return sort_values
+    
     rows_to_sort = list(worksheet.iter_rows(min_row=2, values_only=True))
     new_rows = []
     prev_col_f_value = None
@@ -130,6 +133,7 @@ def hide_columns(worksheet, columns_to_hide):
     for col_index in columns_to_hide:
         col_letter = openpyxl.utils.get_column_letter(col_index)
         worksheet.column_dimensions[col_letter].hidden = True
+        
 make_mapping = {
     "AMC": "AMC",
     "ACUR": "Acura",
